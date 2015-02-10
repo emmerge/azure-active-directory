@@ -23,6 +23,13 @@ AzureAd.requestCredential = function (options, credentialRequestCompleteCallback
 
     var credentialToken = Random.secret();
 
+    // capture any given scopes:
+    var basicScope = ['wl.basic'], scope = [];
+    if (options.requestPermissions)
+        scope = options.requestPermissions;
+    scope = _.union(scope, basicScope);
+    var flatScope = _.map(scope, encodeURIComponent).join('+');
+
     // http://msdn.microsoft.com/en-us/library/azure/dn645542.aspx
     var loginStyle = OAuth._loginStyle('azureAd', config, options);
 
@@ -35,6 +42,7 @@ AzureAd.requestCredential = function (options, credentialRequestCompleteCallback
         'api-version=1.0&' +
         '&response_type=code' +
         '&client_id=' + config.clientId +
+        '&scope=' + flatScope +
         '&state=' + OAuth._stateParam(loginStyle, credentialToken) +
         '&redirect_uri=' + OAuth._redirectUri('azureAd', config);
 
